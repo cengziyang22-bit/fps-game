@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum EnemyAIState { Patrol, Chase, Attack, Dead }
+
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyController : MonoBehaviour
 {
@@ -21,6 +23,9 @@ public class EnemyController : MonoBehaviour
     public GameObject bulletTrailPrefab;
     public GameObject healthBarCanvas;
     public UnityEngine.UI.Image healthBarFill;
+
+    [HideInInspector] public EnemyAIState currentState;
+    [HideInInspector] public float lastShootTime = float.MinValue;
 
     private int currentHealth;
     private bool isAlert = false;
@@ -78,6 +83,7 @@ public class EnemyController : MonoBehaviour
 
     void ChaseAndAttack(float dist)
     {
+        currentState = EnemyAIState.Chase;
         isAlert = true;
         agent.speed = chaseSpeed;
         agent.SetDestination(player.position);
@@ -100,6 +106,7 @@ public class EnemyController : MonoBehaviour
 
     void Patrol()
     {
+        currentState = EnemyAIState.Patrol;
         agent.speed = patrolSpeed;
 
         if (!agent.hasPath || agent.remainingDistance < 1.5f)
@@ -141,6 +148,8 @@ public class EnemyController : MonoBehaviour
     void Shoot()
     {
         if (gunMuzzle == null) return;
+        currentState = EnemyAIState.Attack;
+        lastShootTime = Time.time;
 
         Vector3 origin = gunMuzzle.position;
         Vector3 dir = (player.position - origin).normalized;
@@ -194,12 +203,15 @@ public class EnemyController : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
+        currentState = EnemyAIState.Dead;
 
         GameManager.Instance?.UnregisterEnemy(this);
 
         var ps = GetComponentInChildren<ParticleSystem>();
         if (ps != null) { ps.transform.SetParent(null); ps.Play(); Destroy(ps.gameObject, 2f); }
 
-        Destroy(gameObject);
+        if (agent != null) agent.enabled = false;
+        enabled = false;
+        Destroy(gameObject, 0.3f);
     }
 }
