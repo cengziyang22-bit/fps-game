@@ -3,6 +3,14 @@ using UnityEngine.AI;
 
 public enum EnemyAIState { Patrol, Chase, Attack, Dead }
 
+public struct EnemySnapshot
+{
+    public EnemyAIState state;
+    public float speed;
+    public bool isShooting;
+    public bool isDead;
+}
+
 [RequireComponent(typeof(NavMeshAgent))]
 public class EnemyController : MonoBehaviour
 {
@@ -24,9 +32,10 @@ public class EnemyController : MonoBehaviour
     public GameObject healthBarCanvas;
     public UnityEngine.UI.Image healthBarFill;
 
-    [HideInInspector] public EnemyAIState currentState;
-    [HideInInspector] public float lastShootTime = float.MinValue;
+    public EnemySnapshot snapshot { get; private set; }
 
+    private EnemyAIState currentState;
+    private bool shotThisFrame;
     private int currentHealth;
     private bool isAlert = false;
     private float attackTimer;
@@ -79,6 +88,15 @@ public class EnemyController : MonoBehaviour
             ChaseAndAttack(dist);
         else
             Patrol();
+
+        snapshot = new EnemySnapshot
+        {
+            state = currentState,
+            speed = agent.velocity.magnitude,
+            isShooting = shotThisFrame,
+            isDead = isDead
+        };
+        shotThisFrame = false;
     }
 
     void ChaseAndAttack(float dist)
@@ -149,7 +167,7 @@ public class EnemyController : MonoBehaviour
     {
         if (gunMuzzle == null) return;
         currentState = EnemyAIState.Attack;
-        lastShootTime = Time.time;
+        shotThisFrame = true;
 
         Vector3 origin = gunMuzzle.position;
         Vector3 dir = (player.position - origin).normalized;
