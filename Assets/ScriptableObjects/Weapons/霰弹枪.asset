@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f04e8843b663c74fbb5a5a057e667fb, type: 3}
+  m_Name: "\u9730\u5F39\u67AA"
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponData
+  weaponName: "\u9730\u5F39\u67AA"
+  fireRate: 0.8
+  baseDamage: 20
+  magazineSize: 6
+  reserveAmmo: 24
+  isShotgun: 1
+  pellets: 6
+  spread: 0.175
+  adsFov: 65
